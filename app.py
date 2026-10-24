@@ -7,7 +7,15 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+
 API_KEY = os.getenv("GROQ_API_KEY")
+
+if not API_KEY:
+    try:
+        API_KEY = st.secrets["GROQ_API_KEY"]
+    except (KeyError, FileNotFoundError):
+        API_KEY = None
+
 MODEL = "openai/gpt-oss-120b"
 
 st.set_page_config(
@@ -21,7 +29,10 @@ st.set_page_config(
 
 def call_groq(system_prompt, user_prompt, max_tokens=4000):
     if not API_KEY:
-        raise ValueError("GROQ_API_KEY is missing from your .env file.")
+        raise ValueError(
+        "GROQ_API_KEY is missing. Configure it in your .env file "
+        "or Streamlit Secrets."
+    )
 
     client = Groq(api_key=API_KEY)
 
